@@ -43,6 +43,17 @@ public class Incident {
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
 
+    @Column(name = "assigned_date")
+    private LocalDateTime assignedDate;
+
+    public LocalDateTime getAssignedDate() {
+    return assignedDate;
+    }
+
+    public void setAssignedDate(LocalDateTime assignedDate) {
+    this.assignedDate = assignedDate;
+    }
+
     public Incident() {
     }
 
