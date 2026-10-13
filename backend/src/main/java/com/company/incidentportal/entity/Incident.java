@@ -1,3 +1,4 @@
+
 package com.company.incidentportal.entity;
 
 import jakarta.persistence.*;
@@ -46,13 +47,8 @@ public class Incident {
     @Column(name = "assigned_date")
     private LocalDateTime assignedDate;
 
-    public LocalDateTime getAssignedDate() {
-    return assignedDate;
-    }
-
-    public void setAssignedDate(LocalDateTime assignedDate) {
-    this.assignedDate = assignedDate;
-    }
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     public Incident() {
     }
@@ -139,5 +135,21 @@ public class Incident {
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public LocalDateTime getAssignedDate() {
+        return assignedDate;
+    }
+
+    public void setAssignedDate(LocalDateTime assignedDate) {
+        this.assignedDate = assignedDate;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
