@@ -29,3 +29,7 @@ frontend/build/
 
 # Local application configuration
 backend/src/main/resources/application-local.properties
+
+# Logs
+backend/logs/
+logs/

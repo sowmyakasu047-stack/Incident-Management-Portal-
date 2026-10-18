@@ -1,0 +1,13 @@
+# Copy to application-local.properties (git-ignored) and fill in your own values.
+spring.datasource.url=jdbc:mysql://localhost:3306/incident_management
+spring.datasource.username=root
+spring.datasource.password=CHANGE_ME
+
+# At least 32 characters
+app.jwt.secret=CHANGE_ME_to_a_long_random_string_of_32_chars_or_more
+
+# Dev-only first-run accounts
+app.seed.admin-username=admin
+app.seed.admin-password=CHANGE_ME_admin
+app.seed.user-username=user
+app.seed.user-password=CHANGE_ME_user

@@ -1,13 +1,13 @@
-
 package com.company.incidentportal.repository;
 
 import com.company.incidentportal.entity.Incident;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IncidentRepository extends JpaRepository<Incident, Long> {
+public interface IncidentRepository extends JpaRepository<Incident, Long>, JpaSpecificationExecutor<Incident> {
 
     // Retrieve only active incidents.
     List<Incident> findByDeletedFalse();

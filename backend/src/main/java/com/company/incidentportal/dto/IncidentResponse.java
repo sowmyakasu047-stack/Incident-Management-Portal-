@@ -13,7 +13,9 @@ public class IncidentResponse {
     private String category;
     private Long assignedTo;
     private LocalDateTime assignedDate;
+    private String assignedToUsername;
     private Long createdBy;
+    private String createdByUsername;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
@@ -111,5 +113,21 @@ public class IncidentResponse {
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public String getAssignedToUsername() {
+        return assignedToUsername;
+    }
+
+    public void setAssignedToUsername(String assignedToUsername) {
+        this.assignedToUsername = assignedToUsername;
+    }
+
+    public String getCreatedByUsername() {
+        return createdByUsername;
+    }
+
+    public void setCreatedByUsername(String createdByUsername) {
+        this.createdByUsername = createdByUsername;
     }
 }

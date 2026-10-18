@@ -1,6 +1,7 @@
 package com.company.incidentportal.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class IncidentRequest {
@@ -18,6 +19,8 @@ public class IncidentRequest {
     private String application;
 
     @NotBlank
+    @Pattern(regexp = "(?i)LOW|MEDIUM|HIGH|CRITICAL",
+            message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
     private String priority;
 
     @NotBlank
