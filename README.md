@@ -16,6 +16,8 @@ cp src/main/resources/application-local.properties.example src/main/resources/ap
 # edit it: DB password, app.jwt.secret (32+ chars), seed passwords
 mvn spring-boot:run
 ```
+Set `app.email.allowed-domain=yourcompany.com` to accept only company email addresses when admins create users
+(comma separate several domains; blank = any domain). Email is optional for the seeded accounts.
 On first start the admin/user accounts from `app.seed.*` are created (a blank seed password = not created).
 Secrets can also come from environment variables: `DB_PASSWORD`, `JWT_SECRET`, `SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`.
 
@@ -64,7 +66,7 @@ Lifecycle is strictly `OPEN → IN_PROGRESS → RESOLVED → CLOSED`; closed inc
 | PUT | `/api/incidents/{id}/assign?userId=` | admin |
 | PUT | `/api/incidents/{id}/status` | `{status}` |
 | DELETE | `/api/incidents/{id}` | admin, soft delete |
-| GET/POST | `/api/users` | admin |
+| GET/POST | `/api/users` | admin; create takes `{username,email,password,role}` and rejects emails outside the allowed domain |
 | PUT | `/api/users/{id}/role` | admin, `{role}` |
 
 Send `Authorization: Bearer <token>` on everything except login. Errors share one JSON shape

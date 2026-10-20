@@ -146,13 +146,28 @@ class IncidentPortalIntegrationTest {
 
         mvc.perform(post("/api/users").header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"dave\",\"password\":\"password123\",\"role\":\"user\"}"))
+                        .content("{\"username\":\"dave\",\"email\":\"dave@example.com\",\"password\":\"password123\",\"role\":\"user\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.role").value("USER"))
                 .andExpect(jsonPath("$.password").doesNotExist());
         mvc.perform(post("/api/users").header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"dave\",\"password\":\"password123\",\"role\":\"USER\"}"))
+                        .content("{\"username\":\"dave\",\"email\":\"dave@example.com\",\"password\":\"password123\",\"role\":\"USER\"}"))
+                .andExpect(status().isConflict());
+
+        // email must be on the company domain, valid and unique
+        mvc.perform(post("/api/users").header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"erin\",\"email\":\"erin@gmail.com\",\"password\":\"password123\",\"role\":\"USER\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("company domain")));
+        mvc.perform(post("/api/users").header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"erin\",\"email\":\"not-an-email\",\"password\":\"password123\",\"role\":\"USER\"}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/users").header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"erin\",\"email\":\"DAVE@example.com\",\"password\":\"password123\",\"role\":\"USER\"}"))
                 .andExpect(status().isConflict());
 
         login("dave", "password123").andExpect(status().isOk());

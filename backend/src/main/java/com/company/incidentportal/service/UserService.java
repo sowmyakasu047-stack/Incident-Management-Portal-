@@ -1,5 +1,6 @@
 package com.company.incidentportal.service;
 
+import com.company.incidentportal.config.EmailPolicy;
 import com.company.incidentportal.entity.Roles;
 import com.company.incidentportal.entity.User;
 import com.company.incidentportal.exception.InvalidOperationException;
@@ -23,10 +24,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailPolicy emailPolicy;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       EmailPolicy emailPolicy) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailPolicy = emailPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -44,16 +49,22 @@ public class UserService {
     }
 
     /** Creates a user whose password is stored as a BCrypt hash. */
-    public User createUser(String username, String rawPassword, String role) {
+    public User createUser(String username, String email, String rawPassword, String role) {
 
         String normalizedRole = normalizeRole(role);
+        String normalizedEmail = emailPolicy.validate(email);
 
         if (userRepository.existsByUsername(username)) {
             throw new InvalidOperationException("Username already exists: " + username);
         }
 
+        if (normalizedEmail != null && userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new InvalidOperationException("Email already in use: " + normalizedEmail);
+        }
+
         User user = new User();
         user.setUsername(username);
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(rawPassword));
         user.setRole(normalizedRole);
         user.setCreatedDate(LocalDateTime.now());

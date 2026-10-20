@@ -39,7 +39,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest request) {
         return UserResponse.from(
-                userService.createUser(request.username(), request.password(), request.role()));
+                userService.createUser(
+                        request.username(), request.email(), request.password(), request.role()));
     }
 
     @PutMapping("/{id}/role")

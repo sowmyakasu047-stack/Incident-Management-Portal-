@@ -4,7 +4,7 @@ import UserService from '../services/UserService';
 import { ROLES } from '../utils/constants';
 import { formatDate, getErrorMessage } from '../utils/incidentUtils';
 
-const EMPTY = { username: '', password: '', role: ROLES.USER };
+const EMPTY = { username: '', email: '', password: '', role: ROLES.USER };
 
 /** Admin-only user management: list, create, change role. */
 export default function Users() {
@@ -71,6 +71,12 @@ export default function Users() {
                          maxLength={50} required value={form.username} onChange={handleChange} />
                 </div>
                 <div className="mb-3">
+                  <label htmlFor="new-email" className="form-label">Email</label>
+                  <input id="new-email" name="email" type="email" className="form-control" maxLength={100}
+                         required placeholder="name@yourcompany.com" value={form.email} onChange={handleChange} />
+                  <div className="form-text">Must be a company email address.</div>
+                </div>
+                <div className="mb-3">
                   <label htmlFor="new-password" className="form-label">Password</label>
                   <input id="new-password" name="password" type="password" className="form-control"
                          minLength={8} maxLength={100} required autoComplete="new-password"
@@ -94,13 +100,14 @@ export default function Users() {
           <div className="table-responsive">
             <table className="table align-middle">
               <thead className="table-light">
-                <tr><th>#</th><th>Username</th><th>Role</th><th>Created</th></tr>
+                <tr><th>#</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th></tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td>{u.id}</td>
                     <td>{u.username}{u.id === currentUser.userId && <span className="text-muted"> (you)</span>}</td>
+                    <td>{u.email || '-'}</td>
                     <td style={{ width: 160 }}>
                       <select className="form-select form-select-sm" aria-label={`Role for ${u.username}`}
                               value={u.role} disabled={u.id === currentUser.userId}

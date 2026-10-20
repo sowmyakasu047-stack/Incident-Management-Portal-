@@ -6,8 +6,13 @@ spring.datasource.password=CHANGE_ME
 # At least 32 characters
 app.jwt.secret=CHANGE_ME_to_a_long_random_string_of_32_chars_or_more
 
+# Only this email domain can be registered (blank = any)
+app.email.allowed-domain=yourcompany.com
+
 # Dev-only first-run accounts
 app.seed.admin-username=admin
+app.seed.admin-email=admin@yourcompany.com
 app.seed.admin-password=CHANGE_ME_admin
 app.seed.user-username=user
+app.seed.user-email=user@yourcompany.com
 app.seed.user-password=CHANGE_ME_user

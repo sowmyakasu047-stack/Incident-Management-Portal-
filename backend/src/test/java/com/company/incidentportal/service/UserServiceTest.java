@@ -1,12 +1,14 @@
 package com.company.incidentportal.service;
 
+import com.company.incidentportal.config.EmailPolicy;
 import com.company.incidentportal.entity.User;
+import com.company.incidentportal.exception.InvalidInputException;
 import com.company.incidentportal.exception.InvalidOperationException;
 import com.company.incidentportal.exception.ResourceNotFoundException;
 import com.company.incidentportal.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,18 +34,24 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
     private UserService service;
+
+    @BeforeEach
+    void setUp() {
+        service = new UserService(userRepository, passwordEncoder, new EmailPolicy("aurum.com"));
+    }
 
     @Test
     void shouldCreateUserWithHashedPassword() {
         when(userRepository.existsByUsername("carol")).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase("carol@aurum.com")).thenReturn(false);
         when(passwordEncoder.encode("secret123")).thenReturn("HASH");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User saved = service.createUser("carol", "secret123", "user");
+        User saved = service.createUser("carol", " Carol@Aurum.com ", "secret123", "user");
 
         assertEquals("HASH", saved.getPassword());
+        assertEquals("carol@aurum.com", saved.getEmail());
         assertEquals("USER", saved.getRole());
         assertNotNull(saved.getCreatedDate());
     }
@@ -53,16 +61,43 @@ class UserServiceTest {
         when(userRepository.existsByUsername("carol")).thenReturn(true);
 
         assertThrows(InvalidOperationException.class,
-                () -> service.createUser("carol", "secret123", "USER"));
+                () -> service.createUser("carol", "carol@aurum.com", "secret123", "USER"));
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldRejectEmailOutsideCompanyDomain() {
+        assertThrows(InvalidInputException.class,
+                () -> service.createUser("carol", "carol@gmail.com", "secret123", "USER"));
+        assertThrows(InvalidInputException.class,
+                () -> service.createUser("carol", "not-an-email", "secret123", "USER"));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldRejectDuplicateEmail() {
+        when(userRepository.existsByUsername("carol")).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase("carol@aurum.com")).thenReturn(true);
+
+        assertThrows(InvalidOperationException.class,
+                () -> service.createUser("carol", "carol@aurum.com", "secret123", "USER"));
+    }
+
+    @Test
+    void shouldAllowMissingEmailForSeededAccounts() {
+        when(userRepository.existsByUsername("seed")).thenReturn(false);
+        when(passwordEncoder.encode("secret123")).thenReturn("HASH");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertEquals(null, service.createUser("seed", " ", "secret123", "ADMIN").getEmail());
     }
 
     @Test
     void shouldRejectInvalidRole() {
         assertThrows(InvalidOperationException.class,
-                () -> service.createUser("carol", "secret123", "SUPERUSER"));
+                () -> service.createUser("carol", "carol@aurum.com", "secret123", "SUPERUSER"));
         assertThrows(InvalidOperationException.class,
-                () -> service.createUser("carol", "secret123", null));
+                () -> service.createUser("carol", "carol@aurum.com", "secret123", null));
     }
 
     @Test
