@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { PriorityBadge, StatusBadge } from '../components/Badges';
 import IncidentForm from '../components/IncidentForm';
 import { useAuth } from '../context/AuthContext';
+import AiService from '../services/AiService';
 import IncidentService from '../services/IncidentService';
 import UserService from '../services/UserService';
 import { STATUS_LABELS } from '../utils/constants';
@@ -20,6 +21,9 @@ export default function EditIncident() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [summary, setSummary] = useState('');
+  const [summarizing, setSummarizing] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -39,6 +43,22 @@ export default function EditIncident() {
       UserService.getAll().then(setUsers).catch(() => setUsers([]));
     }
   }, [admin]);
+
+  useEffect(() => {
+    AiService.status().then((s) => setAiEnabled(s.enabled)).catch(() => setAiEnabled(false));
+  }, []);
+
+  const handleSummarize = async () => {
+    setSummarizing(true);
+    setError('');
+    try {
+      setSummary((await AiService.summarize(id)).summary);
+    } catch (err) {
+      setError(getErrorMessage(err, 'The AI helper is not available right now.'));
+    } finally {
+      setSummarizing(false);
+    }
+  };
 
   const run = async (action, successMessage) => {
     setMessage('');
@@ -120,6 +140,15 @@ export default function EditIncident() {
             <dt className="col-sm-3">Last updated</dt>
             <dd className="col-sm-9 mb-0">{formatDate(incident.updatedDate)}</dd>
           </dl>
+          {aiEnabled && (
+            <div className="mt-3">
+              <button type="button" className="btn btn-sm btn-outline-primary" disabled={summarizing}
+                      onClick={handleSummarize}>
+                {summarizing ? 'Summarizing…' : '✨ Summarize with AI'}
+              </button>
+              {summary && <div className="alert alert-info py-2 mt-2 mb-0">{summary}</div>}
+            </div>
+          )}
         </div>
       </div>
 

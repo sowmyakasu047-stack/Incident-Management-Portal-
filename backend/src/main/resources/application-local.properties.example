@@ -16,3 +16,6 @@ app.seed.admin-password=CHANGE_ME_admin
 app.seed.user-username=user
 app.seed.user-email=user@yourcompany.com
 app.seed.user-password=CHANGE_ME_user
+
+# Claude API key for the AI buttons (blank = AI disabled)
+app.ai.api-key=

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PRIORITIES } from '../utils/constants';
+import AiAssistPanel from './AiAssistPanel';
 
 const EMPTY = { title: '', description: '', application: '', priority: 'MEDIUM', category: '' };
 
@@ -10,6 +11,7 @@ export default function IncidentForm({
   submitLabel,
   disabled = false,
   lockApplication = false,
+  enableAi = false,
 }) {
   const [values, setValues] = useState({ ...EMPTY, ...initialValues });
   const [submitting, setSubmitting] = useState(false);
@@ -60,6 +62,13 @@ export default function IncidentForm({
             </select>
           </div>
         </div>
+
+        {enableAi && (
+          <AiAssistPanel
+            values={values}
+            onApply={(priority, category) => setValues((prev) => ({ ...prev, priority, category }))}
+          />
+        )}
 
         <button type="submit" className="btn btn-primary">
           {submitting ? 'Saving…' : submitLabel}

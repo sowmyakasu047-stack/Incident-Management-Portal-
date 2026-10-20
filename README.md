@@ -35,6 +35,16 @@ docker compose up --build
 # open http://localhost:3000
 ```
 
+## AI features (optional, Claude)
+Set `ANTHROPIC_API_KEY` (or `app.ai.api-key` in `application-local.properties`) and restart the backend. Without a key
+the AI buttons simply do not appear. Model defaults to `claude-haiku-5-5` (override with `ANTHROPIC_MODEL`).
+- **Create incident:** "Suggest priority & category" and "Find similar incidents"
+- **Incident details:** "Summarize with AI"
+
+The incident title/description (and, for similar/summary, existing incident titles the user may already see) are sent to
+the Claude API; the key stays on the server. Endpoints: `GET /api/ai/status`, `POST /api/ai/suggest`,
+`POST /api/ai/similar`, `POST /api/ai/incidents/{id}/summary`.
+
 ## Tests
 ```bash
 cd backend

@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import IncidentForm from '../components/IncidentForm';
+import AiService from '../services/AiService';
 import IncidentService from '../services/IncidentService';
 import { getErrorMessage } from '../utils/incidentUtils';
 
 export default function CreateIncident() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [aiEnabled, setAiEnabled] = useState(false);
+
+  // AI buttons only appear when the backend has an API key configured.
+  useEffect(() => {
+    AiService.status().then((s) => setAiEnabled(s.enabled)).catch(() => setAiEnabled(false));
+  }, []);
 
   const handleSubmit = async (values) => {
     setError('');
@@ -24,7 +31,7 @@ export default function CreateIncident() {
       {error && <div className="alert alert-danger">{error}</div>}
       <div className="card">
         <div className="card-body">
-          <IncidentForm onSubmit={handleSubmit} submitLabel="Create Incident" />
+          <IncidentForm onSubmit={handleSubmit} submitLabel="Create Incident" enableAi={aiEnabled} />
         </div>
       </div>
     </div>
